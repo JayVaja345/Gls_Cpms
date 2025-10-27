@@ -28,8 +28,10 @@ app.use('/management', require('./routes/management.route'));
 // routes for admin user
 app.use('/admin', require('./routes/superuser.route'));
 
+app.use('/admin', require('./routes/superuser.route'));
+
 // route for company
-app.use('/company', require('./routes/company.route'));
+app.use('/api/export', require('./routes/export.route'));
 
 
 
