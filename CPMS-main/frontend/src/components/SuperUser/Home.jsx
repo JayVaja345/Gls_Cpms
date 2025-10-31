@@ -8,6 +8,7 @@ function Home() {
   document.title = 'CPMS | Admin Dashboard';
 
   const [countUsers, setCountUsers] = useState({});
+  const [alumniCount, setAlumniCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +27,21 @@ function Home() {
       }
     }
 
+    const fetchAlumniCount = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/admin/alumni`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          }
+        });
+        setAlumniCount(response.data.alumni.length);
+      } catch (error) {
+        console.log("Home.jsx => fetchAlumniCount => ", error);
+      }
+    }
+
     fetchUser();
+    fetchAlumniCount();
   }, []);
 
   return (
@@ -61,6 +76,12 @@ function Home() {
                 <span className='text-3xl max-sm:text-2xl'>Superuser</span>
                 <span className='text-3xl max-sm:text-2xl'>{countUsers.superUsers}</span>
               </div>
+              <Link className='text-black no-underline' to='../admin/alumni'>
+                <div className="bg-slate-300/30 shadow h-44 w-60 text-center flex flex-col justify-evenly items-center rounded-md cursor-pointer border-2 border-gray-600 transition-all ease-in-out hover:bg-slate-400/30  max-sm:h-32 max-sm:w-44">
+                  <span className='text-3xl max-sm:text-2xl'>Alumni Records</span>
+                  <span className='text-3xl max-sm:text-2xl'>{alumniCount}</span>
+                </div>
+              </Link>
             </div>
             {
               countUsers.studentApprovalPendingUsers !== 0 &&

@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema({
   number: { type: Number, },
   password: { type: String, required: true },
   role: { type: String, enum: ['student', 'tpo_admin', 'management_admin', 'superuser'], required: true },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   profile: {
     type: String,
     default: 'https://res.cloudinary.com/dgu6xwnzx/image/upload/v1743159225/defaultProfileImg_cmmurk.jpg',
