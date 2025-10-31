@@ -13,24 +13,6 @@ const { managementUsers, managementAddUsers, managementDeleteUsers } = require('
 const { tpoUsers, tpoAddUsers, tpoDeleteUsers } = require('../controllers/SuperUser/user-tpo.controller.js');
 // student methods
 const { studentUsers, studentAddUsers, studentDeleteUsers, studentApprove } = require('../controllers/SuperUser/user-student.controller.js');
-// alumni methods
-const { 
-  getAllAlumni, 
-  getAlumniById, 
-  getAlumniByFilters, 
-  createAlumni, 
-  updateAlumni, 
-  deleteAlumni,
-  getPlacementStats,
-  getPassingYears
-} = require('../controllers/SuperUser/alumni.controller.js');
-// user block/unblock methods
-const { 
-  getAllUsersWithStatus, 
-  toggleUserStatus, 
-  deactivateUser, 
-  activateUser 
-} = require('../controllers/SuperUser/user-block.controller.js');
 
 
 
@@ -52,22 +34,6 @@ router.post('/student-add-user', authenticateToken, studentAddUsers);
 router.post('/student-delete-user', authenticateToken, studentDeleteUsers);
 // approve student
 router.post('/student-approve', authenticateToken, studentApprove);
-
-// alumni routes
-router.get('/alumni', authenticateToken, getAllAlumni);
-router.get('/alumni/stats', authenticateToken, getPlacementStats);
-router.get('/alumni/years', authenticateToken, getPassingYears);
-router.get('/alumni/filter', authenticateToken, getAlumniByFilters);
-router.get('/alumni/:id', authenticateToken, getAlumniById);
-router.post('/alumni', authenticateToken, createAlumni);
-router.put('/alumni/:id', authenticateToken, updateAlumni);
-router.delete('/alumni/:id', authenticateToken, deleteAlumni);
-
-// user block/unblock routes
-router.get('/users/status', authenticateToken, getAllUsersWithStatus);
-router.post('/users/toggle-status', authenticateToken, toggleUserStatus);
-router.post('/users/deactivate', authenticateToken, deactivateUser);
-router.post('/users/activate', authenticateToken, activateUser);
 
 
 module.exports = router;

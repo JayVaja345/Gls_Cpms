@@ -29,11 +29,6 @@ const ManagementSuperUser = lazy(() => import("./components/SuperUser/AddManagem
 const StudentSuperUser = lazy(() => import("./components/SuperUser/AddStudent.jsx"));
 const HomeSuperUser = lazy(() => import("./components/SuperUser/Home.jsx"));
 const ApproveStudent = lazy(() => import("./components/ApproveStudent.jsx"));
-const AlumniList = lazy(() => import("./components/SuperUser/AlumniList.jsx"));
-const AddEditAlumni = lazy(() => import("./components/SuperUser/AddEditAlumni.jsx"));
-const AlumniDetail = lazy(() => import("./components/SuperUser/AlumniDetail.jsx"));
-const AlumniStats = lazy(() => import("./components/SuperUser/AlumniStats.jsx"));
-const BlockUsers = lazy(() => import("./components/SuperUser/BlockUsers.jsx"));
 
 // common users
 // for admin, tpo to edit or view user details 
@@ -385,26 +380,6 @@ function App() {
               {/* edit post jobs */}
               <Route element={<Layout header="Edit Job Detail" />}>
                 <Route path="/admin/post-job/:jobId" element={<PostJobTPO />} />
-              </Route>
-              {/* alumni routes */}
-              <Route element={<Layout header="Alumni Placement Records" />}>
-                <Route path="/admin/alumni" element={<AlumniList />} />
-              </Route>
-              <Route element={<Layout header="Add Alumni Record" />}>
-                <Route path="/admin/add-alumni" element={<AddEditAlumni />} />
-              </Route>
-              <Route element={<Layout header="Edit Alumni Record" />}>
-                <Route path="/admin/edit-alumni/:id" element={<AddEditAlumni />} />
-              </Route>
-              <Route element={<Layout header="Alumni Details" />}>
-                <Route path="/admin/alumni/:id" element={<AlumniDetail />} />
-              </Route>
-              <Route element={<Layout header="Alumni Statistics" />}>
-                <Route path="/admin/alumni-stats" element={<AlumniStats />} />
-              </Route>
-              {/* block users route */}
-              <Route element={<Layout header="Block/Unblock Users" />}>
-                <Route path="/admin/block-users" element={<BlockUsers />} />
               </Route>
 
             </Route>
