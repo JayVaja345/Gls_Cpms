@@ -24,13 +24,6 @@ const {
   getPlacementStats,
   getPassingYears
 } = require('../controllers/SuperUser/alumni.controller.js');
-// user block/unblock methods
-const { 
-  getAllUsersWithStatus, 
-  toggleUserStatus, 
-  deactivateUser, 
-  activateUser 
-} = require('../controllers/SuperUser/user-block.controller.js');
 
 
 
@@ -62,12 +55,6 @@ router.get('/alumni/:id', authenticateToken, getAlumniById);
 router.post('/alumni', authenticateToken, createAlumni);
 router.put('/alumni/:id', authenticateToken, updateAlumni);
 router.delete('/alumni/:id', authenticateToken, deleteAlumni);
-
-// user block/unblock routes
-router.get('/users/status', authenticateToken, getAllUsersWithStatus);
-router.post('/users/toggle-status', authenticateToken, toggleUserStatus);
-router.post('/users/deactivate', authenticateToken, deactivateUser);
-router.post('/users/activate', authenticateToken, activateUser);
 
 
 module.exports = router;

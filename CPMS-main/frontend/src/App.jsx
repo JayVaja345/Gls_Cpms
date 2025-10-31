@@ -33,7 +33,6 @@ const AlumniList = lazy(() => import("./components/SuperUser/AlumniList.jsx"));
 const AddEditAlumni = lazy(() => import("./components/SuperUser/AddEditAlumni.jsx"));
 const AlumniDetail = lazy(() => import("./components/SuperUser/AlumniDetail.jsx"));
 const AlumniStats = lazy(() => import("./components/SuperUser/AlumniStats.jsx"));
-const BlockUsers = lazy(() => import("./components/SuperUser/BlockUsers.jsx"));
 
 // common users
 // for admin, tpo to edit or view user details 
@@ -401,10 +400,6 @@ function App() {
               </Route>
               <Route element={<Layout header="Alumni Statistics" />}>
                 <Route path="/admin/alumni-stats" element={<AlumniStats />} />
-              </Route>
-              {/* block users route */}
-              <Route element={<Layout header="Block/Unblock Users" />}>
-                <Route path="/admin/block-users" element={<BlockUsers />} />
               </Route>
 
             </Route>

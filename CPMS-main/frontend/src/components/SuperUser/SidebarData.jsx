@@ -9,7 +9,6 @@ import { FaClipboardCheck, FaIndustry, FaEnvelopeOpenText } from "react-icons/fa
 import { LiaIndustrySolid } from "react-icons/lia";
 import { FaUserSecret } from "react-icons/fa";
 import { FaUserGraduate } from "react-icons/fa";
-import { FaBan } from "react-icons/fa";
 
 export const SidebarData = [
   {
@@ -147,10 +146,5 @@ export const SidebarData = [
         cName: "sub-nav",
       },
     ],
-  },
-  {
-    title: "Block Users",
-    path: "/admin/block-users",
-    icon: <FaBan />
   },
 ];
