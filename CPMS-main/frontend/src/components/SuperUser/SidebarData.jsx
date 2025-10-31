@@ -8,6 +8,8 @@ import { PiStudentDuotone } from "react-icons/pi";
 import { FaClipboardCheck, FaIndustry, FaEnvelopeOpenText } from "react-icons/fa";
 import { LiaIndustrySolid } from "react-icons/lia";
 import { FaUserSecret } from "react-icons/fa";
+import { FaUserGraduate } from "react-icons/fa";
+import { FaBan } from "react-icons/fa";
 
 export const SidebarData = [
   {
@@ -119,5 +121,36 @@ export const SidebarData = [
         icon: <RiPlayListAddLine />,
       },
     ],
+  },
+  {
+    title: "Alumni Records",
+    icon: <FaUserGraduate />,
+    iconClosed: <RiArrowDownSFill />,
+    iconOpened: <RiArrowUpSFill />,
+    subNav: [
+      {
+        title: "List All",
+        path: "/admin/alumni",
+        icon: <FaListUl />,
+        cName: "sub-nav",
+      },
+      {
+        title: "Add New",
+        path: "/admin/add-alumni",
+        icon: <RiPlayListAddLine />,
+        cName: "sub-nav",
+      },
+      {
+        title: "Statistics",
+        path: "/admin/alumni-stats",
+        icon: <FaClipboardCheck />,
+        cName: "sub-nav",
+      },
+    ],
+  },
+  {
+    title: "Block Users",
+    path: "/admin/block-users",
+    icon: <FaBan />
   },
 ];

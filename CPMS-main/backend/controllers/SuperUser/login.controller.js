@@ -10,6 +10,10 @@ const Login = async (req, res) => {
     if (!user)
       return res.status(400).json({ msg: "User Doesn't Exist!" });
 
+    // Check if user account is active
+    if (user.status === 'inactive')
+      return res.status(403).json({ msg: 'Your account has been deactivated. Please contact the administrator!' });
+
     const isMatch = await bcrypt.compare(password, user.password);
     
     
