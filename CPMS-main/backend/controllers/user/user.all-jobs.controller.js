@@ -1,5 +1,6 @@
 const User = require("../../models/user.model");
 const JobSchema = require("../../models/job.model");
+const { logAudit } = require('../../utils/auditLogger');
 
 
 const AllJobs = async (req, res) => {
@@ -20,6 +21,11 @@ const DeleteJob = async (req, res) => {
 
       // before this middleware pre will run to delete student's appliedJobs
       await job.deleteOne();
+      // audit log
+      logAudit(req, {
+        actionType: 'JOB_DELETED',
+        description: `Deleted job: ${job.jobTitle}`
+      });
       return res.status(200).json({ msg: 'Job deleted successfully!' });
     }
   } catch (error) {

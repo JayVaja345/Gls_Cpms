@@ -1,5 +1,6 @@
 const User = require("../../models/user.model");
 const bcrypt = require("bcrypt");
+const { logAudit } = require('../../utils/auditLogger');
 
 
 const tpoUsers = async (req, res) => {
@@ -18,6 +19,13 @@ const tpoAddUsers = async (req, res) => {
 
     const newUser = new User({ first_name: req.body.first_name, email: req.body.email, number: req.body.number, password: hashPassword, role: "tpo_admin" });
     await newUser.save();
+
+    // create audit log
+    logAudit(req, {
+      actionType: 'TPO_USER_CREATED',
+      description: `Created TPO admin: ${newUser.email}`
+    });
+
     return res.json({ msg: "User Created!" });
   } catch (error) {
     console.log("user-tpo.controller => ", error);
@@ -29,6 +37,11 @@ const tpoDeleteUsers = async (req, res) => {
   // const user = await Users.find({email: req.body.email});
   const ress = await User.deleteOne({ email: req.body.email });
   if (ress.acknowledged) {
+    // audit log
+    logAudit(req, {
+      actionType: 'TPO_USER_DELETED',
+      description: `Deleted TPO admin: ${req.body.email}`
+    });
     return res.json({ msg: "User Deleted Successfully!" });
   } else {
     return res.json({ msg: "Error While Deleting User!" });

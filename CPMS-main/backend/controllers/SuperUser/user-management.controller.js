@@ -1,5 +1,6 @@
 const User = require("../../models/user.model");
 const bcrypt = require("bcrypt");
+const { logAudit } = require('../../utils/auditLogger');
 
 // get management user
 const managementUsers = async (req, res) => {
@@ -18,6 +19,11 @@ const managementAddUsers = async (req, res) => {
 
     const newUser = new User({ first_name: req.body.first_name, email: req.body.email, number: req.body.number, password: hashPassword, role: "management_admin" });
     await newUser.save();
+    // audit log
+    logAudit(req, {
+      actionType: 'MANAGEMENT_USER_CREATED',
+      description: `Created management admin: ${newUser.email}`
+    });
     return res.json({ msg: "User Created!" });
   } catch (error) {
     console.log("admin.user-management => ", error);
@@ -29,6 +35,11 @@ const managementDeleteUsers = async (req, res) => {
   // const user = await Users.find({email: req.body.email});
   const ress = await User.deleteOne({ email: req.body.email });
   if (ress.acknowledged) {
+    // audit log
+    logAudit(req, {
+      actionType: 'MANAGEMENT_USER_DELETED',
+      description: `Deleted management admin: ${req.body.email}`
+    });
     return res.json({ msg: "User Deleted Successfully!" });
   } else {
     return res.json({ msg: "Error While Deleting User!" });
