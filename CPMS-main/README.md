@@ -132,8 +132,8 @@ cd college-placement-management-system
    ```
 
 ## Contributors
-- **Member 1**: [Moin MN](https://www.linkedin.com/in/moinnaik/)
-- **Member 2**: Rafat Muskan Shaikh
-- **Member 3**: Saquib Patel
-- **Member 4**: Neeraj Kumar
+- **Member 1**: Jay Vaja
+- **Member 2**: Darshil Pandit
+- **Member 3**: Namra Shah
+- **Member 4**: Arpan Bagadia
 

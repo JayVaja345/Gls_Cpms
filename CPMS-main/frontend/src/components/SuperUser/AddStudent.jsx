@@ -3,10 +3,10 @@ import axios from 'axios';
 import Toast from '../Toast';
 import ModalBox from '../Modal';
 import AddUserTable from '../AddUserTable';
+import StudentExportButton from '../StudentExportButton'; // ✅ Imported as StudentExportButton
 import { BASE_URL } from '../../config/backend_url';
 
 function AddStudent() {
-
   // student users store here
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +18,13 @@ function AddStudent() {
   // useState for Modal display
   const [showModal, setShowModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+
+  // State for export filters
+  const [exportFilters, setExportFilters] = useState({
+    department: '',
+    year: '',
+    isApproved: ''
+  });
 
   const fetchUserDetails = async () => {
     try {
@@ -102,23 +109,120 @@ function AddStudent() {
         setToastMessage(response.data.msg);
         setShowToast(true);
         fetchUserDetails();
+        // Reset form
+        setData({
+          first_name: "",
+          email: "",
+          number: "",
+          password: ""
+        });
+        setFormOpen(false);
       }
     } catch (error) {
-      console.log("handleSubmit => Mangement.jsx ==> ", error);
+      console.log("handleSubmit => AddStudent.js ==> ", error);
+      setToastMessage(error?.response?.data?.msg || "Error adding student");
+      setShowToast(true);
     }
   }
 
+  // Handle export filter changes
+  const handleFilterChange = (filterType, value) => {
+    setExportFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
 
   return (
     <>
-      {/*  any message here  */}
-      < Toast
+      {/* Toast for messages */}
+      <Toast
         show={showToast}
         onClose={() => setShowToast(false)}
         message={toastMessage}
         delay={3000}
         position="bottom-end"
       />
+
+      {/* Export Section */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">Export Student Data</h3>
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {/* Department Filter */}
+            <select 
+              value={exportFilters.department} 
+              onChange={(e) => handleFilterChange('department', e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            >
+              <option value="">All Departments</option>
+              <option value="Computer">Computer</option>
+              <option value="Civil">Civil</option>
+              <option value="ECS">ECS</option>
+              <option value="AIDS">AIDS</option>
+              <option value="Mechanical">Mechanical</option>
+            </select>
+
+            {/* Year Filter */}
+            <select 
+              value={exportFilters.year} 
+              onChange={(e) => handleFilterChange('year', e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            >
+              <option value="">All Years</option>
+              <option value="1">First Year</option>
+              <option value="2">Second Year</option>
+              <option value="3">Third Year</option>
+              <option value="4">Fourth Year</option>
+            </select>
+
+            {/* Approval Status Filter */}
+            <select 
+              value={exportFilters.isApproved} 
+              onChange={(e) => handleFilterChange('isApproved', e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            >
+              <option value="">All Status</option>
+              <option value="true">Approved</option>
+              <option value="false">Not Approved</option>
+            </select>
+
+            {/* ✅ CORRECTED: Use StudentExportButton (not StudentCSVExportButton) */}
+            <div className="group">
+              <StudentExportButton 
+                filters={exportFilters}
+                buttonText="Export Data"
+                users={users}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Info */}
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <span className="bg-white px-3 py-1 rounded-full border border-gray-200">
+            Total Students: <span className="font-semibold text-gray-800">{users.length}</span>
+          </span>
+          {exportFilters.department && (
+            <span className="bg-white px-3 py-1 rounded-full border border-gray-200">
+              Department: <span className="font-semibold text-gray-800">{exportFilters.department}</span>
+            </span>
+          )}
+          {exportFilters.year && (
+            <span className="bg-white px-3 py-1 rounded-full border border-gray-200">
+              Year: <span className="font-semibold text-gray-800">{exportFilters.year}</span>
+            </span>
+          )}
+          {exportFilters.isApproved && (
+            <span className="bg-white px-3 py-1 rounded-full border border-gray-200">
+              Status: <span className="font-semibold text-gray-800">
+                {exportFilters.isApproved === 'true' ? 'Approved' : 'Not Approved'}
+              </span>
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* AddUserTable Component */}
       <AddUserTable
@@ -151,4 +255,4 @@ function AddStudent() {
   )
 }
 
-export default AddStudent
+export default AddStudent;
