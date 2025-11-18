@@ -1,6 +1,7 @@
 const User = require("../../models/user.model");
 const JobSchema = require("../../models/job.model");
 const bcrypt = require("bcrypt");
+const { logAudit } = require('../../utils/auditLogger');
 
 
 const studentUsers = async (req, res) => {
@@ -43,6 +44,11 @@ const studentDeleteUsers = async (req, res) => {
     // console.log(user);
     // delete user and releted data
     await user.deleteOne();
+    // audit log
+    logAudit(req, {
+      actionType: 'STUDENT_USER_DELETED',
+      description: `Deleted student user: ${req.body.email}`
+    });
     return res.json({ msg: "User Deleted Successfully!" });
   } catch (error) {
     console.log("user-delete-student.controller => ", error)
@@ -61,6 +67,11 @@ const studentApprove = async (req, res) => {
 
     user.studentProfile.isApproved = true;
     await user.save();
+    // audit log
+    logAudit(req, {
+      actionType: 'STUDENT_APPROVED',
+      description: `Approved student user: ${user.email}`
+    });
     return res.json({ msg: "Student Successfully Approved!" });
   } catch (error) {
     console.error('Error approving student user:', error);

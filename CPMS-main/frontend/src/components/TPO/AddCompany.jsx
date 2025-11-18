@@ -14,6 +14,7 @@ function AddCompany() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasPermission, setHasPermission] = useState(false);
 
   const { companyId } = useParams();
 
@@ -26,14 +27,84 @@ function AddCompany() {
 
   const [data, setData] = useState();
 
+  //Check user permissions
+ useEffect(() => {
+  const checkPermission = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/company/check-permission`,
+        {},
+        {
+          params: { access: 'company_add' },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        }
+      );
+
+      if (response.data.msg === 'Permission granted.') {
+        setHasPermission(true);
+      }
+    } catch (error) {
+      setHasPermission(false);
+      if (error?.response?.status === 403) {
+        setToastMessage("You don't have permission to add companies");
+        setShowToast(true);
+        // setTimeout(() => {
+        //   navigate('/dashboard');
+        // }, 2000);
+      } else if (error?.response?.status === 401) {
+        setToastMessage('Please login to continue');
+        setShowToast(true);
+        // setTimeout(() => navigate('/login'), 1500);
+      } else {
+        setToastMessage('Unable to verify permission.');
+        setShowToast(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  checkPermission();
+}, [navigate]);
+
+
   const closeModal = () => {
     setShowModal(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!data?.companyName || !data?.companyDescription || !data?.companyDifficulty || !data?.companyLocation || !data?.companyWebsite)
-      return setError("All Fields Required!");
+    setError('');
+    
+    // Validate all required fields
+    const requiredFields = {
+      companyName: 'Company Name',
+      companyDescription: 'Company Description',
+      companyDifficulty: 'Company Difficulty',
+      companyLocation: 'Company Location',
+      companyWebsite: 'Company Website'
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key]) => !data?.[key])
+      .map(([_, label]) => label);
+
+    if (missingFields.length > 0) {
+      setError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+      setShowToast(true);
+      return;
+    }
+
+    // Validate website URL format
+    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (!urlPattern.test(data.companyWebsite)) {
+      setError('Please enter a valid website URL');
+      setShowToast(true);
+      return;
+    }
+
     setShowModal(true);
   }
 
@@ -44,8 +115,10 @@ function AddCompany() {
     try {
       const response = await axios.post(url, data,
         {
+          params: { access: 'company_add' },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'Content-Type': 'application/json'
           }
         }
       )
@@ -61,8 +134,48 @@ function AddCompany() {
     } catch (error) {
       console.log("AddCompany error while fetching => ", error);
       setShowModal(false);
-      setToastMessage(error?.response?.data?.msg);
+      
+      const errorMsg = error?.response?.data?.msg;
+      const statusCode = error?.response?.status;
+      let displayMessage = '';
+      
+      if (!navigator.onLine) {
+        displayMessage = 'Please check your internet connection and try again.';
+      } else if (!error.response) {
+        displayMessage = 'Unable to reach the server. Please try again in a few moments.';
+      } else {
+        switch (statusCode) {
+          case 403:
+            displayMessage = `Permission Denied: ${errorMsg || 'You do not have permission to perform this action'}`;
+            break;
+          case 400:
+            displayMessage = `Invalid Data: ${errorMsg || 'Please check your input and try again'}`;
+            break;
+          case 409:
+            displayMessage = `Conflict: ${errorMsg || 'A company with this name already exists'}`;
+            break;
+          case 500:
+            displayMessage = 'The server encountered an error. Our team has been notified.';
+            break;
+          case 401:
+            displayMessage = 'Your session has expired. Please log in again.';
+            // Optionally redirect to login page
+            setTimeout(() => navigate('/login'), 2000);
+            break;
+          default:
+            if (errorMsg) {
+              displayMessage = `Error: ${errorMsg}`;
+            } else if (error.code === 'ECONNABORTED') {
+              displayMessage = 'Request timed out. Please try again.';
+            } else {
+              displayMessage = 'Unable to add company. Please verify your inputs and try again.';
+            }
+        }
+      }
+      
+      setToastMessage(displayMessage);
       setShowToast(true);
+      setError(displayMessage);
     }
   }
 
@@ -106,6 +219,22 @@ function AddCompany() {
         loading ? (
           <div className="flex justify-center h-72 items-center">
             <i className="fa-solid fa-spinner fa-spin text-3xl" />
+          </div>
+        ) : !hasPermission ? (
+          <div className="flex flex-col items-center justify-center h-72">
+            <div className="text-center p-8 max-w-lg w-full backdrop-blur-md bg-white/30 border border-white/20 rounded-lg shadow shadow-red-400">
+              <div className="text-red-500 text-5xl mb-4">
+                <i className="fas fa-lock"></i>
+              </div>
+              <h4 className="text-xl font-semibold mb-3">Access Denied</h4>
+              <p className="text-gray-600 mb-3">
+                You don't have permission to {companyId ? "update" : "add"} companies.
+              </p>
+              <hr className="my-4" />
+              <p className="text-sm text-gray-500">
+                Please contact your administrator if you need access.
+              </p>
+            </div>
           </div>
         ) : (
           <>

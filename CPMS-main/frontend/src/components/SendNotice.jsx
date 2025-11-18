@@ -20,9 +20,51 @@ function SendNotice() {
   const [currentUser, setCurrentUser] = useState({ role: '', id: '' });  // Current user state
   const [showToast, setShowToast] = useState(false);                     // Toast visibility
   const [toastMessage, setToastMessage] = useState('');                  // Toast message content
-  const [showModal, setShowModal] = useState(false);                     // Modal visibility
+  const [showModal, setShowModal] = useState(false);  
+  const [hasPermission, setHasPermission] = useState(false);              // Modal visibility
 
   const closeModal = () => setShowModal(false);  // Function to close the modal
+
+   useEffect(() => {
+      const checkPermission = async () => {
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/company/check-permission`,
+          {},
+          {
+            params: { access: 'notice_add' },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
+          }
+        );
+  
+        if (response.data.msg === 'Permission granted.') {
+          setHasPermission(true);
+        }
+      } catch (error) {
+        setHasPermission(false);
+        if (error?.response?.status === 403) {
+          setToastMessage("You don't have permission to add notice.");
+          setShowToast(true);
+          // setTimeout(() => {
+          //   navigate('/dashboard');
+          // }, 2000);
+        } else if (error?.response?.status === 401) {
+          setToastMessage('Please login to continue');
+          setShowToast(true);
+          // setTimeout(() => navigate('/login'), 1500);
+        } else {
+          setToastMessage('Unable to verify permission.');
+          setShowToast(true);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    checkPermission();
+  }, [navigate]);
 
   // Fetch current user data and handle authentication
   useEffect(() => {
@@ -104,7 +146,23 @@ function SendNotice() {
         <div className="flex justify-center h-72 items-center">
           <i className="fa-solid fa-spinner fa-spin text-3xl" />
         </div>
-      ) : (
+      ) : !hasPermission ? (
+          <div className="flex flex-col items-center justify-center h-72">
+            <div className="text-center p-8 max-w-lg w-full backdrop-blur-md bg-white/30 border border-white/20 rounded-lg shadow shadow-red-400">
+              <div className="text-red-500 text-5xl mb-4">
+                <i className="fas fa-lock"></i>
+              </div>
+              <h4 className="text-xl font-semibold mb-3">Access Denied</h4>
+              <p className="text-gray-600 mb-3">
+                You don't have permission to add notice.
+              </p>
+              <hr className="my-4" />
+              <p className="text-sm text-gray-500">
+                Please contact your administrator if you need access.
+              </p>
+            </div>
+          </div>
+        ) : (
         <>
           <div className="">
             <div className="my-8 backdrop-blur-md bg-white/30 border border-white/20 rounded-lg shadow shadow-red-400 p-6 max-sm:text-sm max-sm:p-3">

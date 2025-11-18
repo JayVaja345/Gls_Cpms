@@ -16,10 +16,10 @@ const StudentTable = ({ branchName, studentData }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get(`${BASE_URL}/user/detail`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+  params: { access: 'students:list' },
+  headers: { Authorization: `Bearer ${token}` }
+  })
+
       .then(res => {
         setCurrentUser({
           role: res.data.role,

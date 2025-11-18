@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const sendMail = require("../../config/Nodemailer");
 const emailTemplate = require("../../utlis/emailTemplates");
 const generatePassword = require('../../utlis/generatePassword');
+const { logAudit } = require('../../utils/auditLogger');
 
 const AddTPO = async (req, res) => {
   const { email, first_name, number } = req.body;
@@ -27,6 +28,11 @@ const AddTPO = async (req, res) => {
 
     await sendMail(email, subject, html);
 
+    // audit log
+    logAudit(req, {
+      actionType: 'TPO_USER_CREATED',
+      description: `Created TPO admin: ${email}`
+    });
     return res.json({ msg: "User Created!" });
   } catch (error) {
     console.log("management-user-add-tpo => ", error);
@@ -56,6 +62,11 @@ const AddManagement = async (req, res) => {
     const subject = "Welcome to CPMS | Your Login Credentials as a Management";
 
     await sendMail(email, subject, html);
+    // audit log
+    logAudit(req, {
+      actionType: 'MANAGEMENT_USER_CREATED',
+      description: `Created management admin: ${email}`
+    });
     return res.json({ msg: "User Created!" });
   } catch (error) {
     console.log("management-user-add-management => ", error);

@@ -58,13 +58,13 @@ export const SidebarData = [
     ],
   },
   {
-    title: "Student",
+    title: "Students",
     icon: <PiStudentDuotone />,
     iconClosed: <RiArrowDownSFill />,
     iconOpened: <RiArrowUpSFill />,
     subNav: [
       {
-        title: "List All",
+        title: "List",
         path: "/admin/student",
         icon: <FaListUl />,
         cName: "sub-nav",
@@ -131,13 +131,21 @@ export const SidebarData = [
       {
         title: "List All",
         path: "/admin/alumni",
+    title: "Role Customization",
+    icon: <FaIndustry />,
+    iconClosed: <RiArrowDownSFill />,
+    iconOpened: <RiArrowUpSFill />,
+
+    subNav: [
+      {
+        title: "Manage Roles",
+        path: "/admin/manage-roles",
         icon: <FaListUl />,
         cName: "sub-nav",
       },
       {
         title: "Add New",
         path: "/admin/add-alumni",
-        icon: <RiPlayListAddLine />,
         cName: "sub-nav",
       },
       {
@@ -153,4 +161,16 @@ export const SidebarData = [
     path: "/admin/block-users",
     icon: <FaBan />
   },
+        title: "List All User Roles",
+        path: "/admin/role-customization",
+        cName: "sub-nav",
+      },
+    ],
+    
+  },
+  {
+    title: "Placement Report",
+    path: "/admin/placement-report",
+    icon: <FaClipboardCheck />,
+  }
 ];

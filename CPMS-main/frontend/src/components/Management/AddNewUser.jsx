@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Form, FloatingLabel } from 'react-bootstrap';
 import { GrFormAdd } from 'react-icons/gr';
 import axios from 'axios';
 import Toast from '../Toast';
 import ModalBox from '../Modal';
 import { BASE_URL } from '../../config/backend_url';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 
 function AddNewUser() {
   document.title = 'CPMS | Add new user';
-
+  const navigate = useNavigate(); 
   const location = useLocation();
   // filter management or tpo or student to add
   const userToAdd = location.pathname.split('/').filter(link => link !== '' && link !== 'admin' && link !== 'management')[0].split('-').filter(link => link !== 'add' && link !== 'admin')[0];
@@ -30,6 +30,35 @@ function AddNewUser() {
 
   // useState for Modal display
   const [showModal, setShowModal] = useState(false);
+
+  const [hasPermission, setHasPermission] = useState(false);
+
+   useEffect(() => {
+    const checkPermission = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/company/check-permission`,
+        {},
+        {
+          params: { access: 'tpo_add' },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        }
+      );
+
+      if (response.data.msg === 'Permission granted.') {
+        setHasPermission(true);
+      }
+    } catch (error) {
+      setHasPermission(false);
+    }
+  };
+
+  checkPermission();
+}, [navigate]);
+
+
 
   const closeModal = () => setShowModal(false);
 
@@ -52,7 +81,7 @@ function AddNewUser() {
 
   const handleSubmitManagement = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/management/add-management`,
+      const response = await axios.post(`${BASE_URL}/admin/management-add-user`,
         data,
         {
           headers: {
@@ -78,7 +107,8 @@ function AddNewUser() {
 
   const handleSubmitTPO = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/management/addtpo`,
+      console.log(data)
+      const response = await axios.post(`${BASE_URL}/admin/tpo-add-user`,
         data,
         {
           headers: {
@@ -139,7 +169,15 @@ function AddNewUser() {
         position="top-center"
       />
 
-      <div className="flex justify-center items-center h-full max-md:h-fit text-base max-sm:text-sm">
+      {
+        !hasPermission ? (
+          <div className="flex justify-center items-center h-[80vh]">
+            <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+              <h2 className="text-xl text-red-600 mb-2">Access Denied</h2>
+              <p className="text-gray-600">{'You do not have permission to view this content.'}</p>
+            </div>
+          </div>
+        ) : (  <div className="flex justify-center items-center h-full max-md:h-fit text-base max-sm:text-sm">
         <div className="my-4 backdrop-blur-md bg-white/30 border border-white/20 rounded-lg p-8 shadow shadow-red-400 w-fit">
           <Form onSubmit={handleModalSubmit} className='flex flex-col justify-center items-center'>
             <div className="flex flex-col gap-3">
@@ -212,7 +250,10 @@ function AddNewUser() {
             </button>
           </Form>
         </div>
-      </div>
+      </div> )
+      }
+
+    
 
       {/* ModalBox Component */}
       <ModalBox

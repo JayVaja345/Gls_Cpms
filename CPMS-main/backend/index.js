@@ -18,7 +18,7 @@ mongodb();
 
 
 // routes for user
-app.use('/user', require('./routes/user.route'));
+app.use('/user', require('./routes/user.route').router);
 // routes for student user
 app.use('/student', require('./routes/student.route'));
 // routes for tpo user
@@ -32,6 +32,10 @@ app.use('/admin', require('./routes/superuser.route'));
 
 // route for company
 app.use('/api/export', require('./routes/export.route'));
+
+app.use('/company', require('./routes/company.route'));
+// route for audit logs
+app.use('/audit', require('./routes/auditLogRoutes'));
 
 
 

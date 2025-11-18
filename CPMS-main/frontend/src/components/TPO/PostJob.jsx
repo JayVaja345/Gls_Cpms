@@ -28,9 +28,52 @@ function PostJob() {
   // useState for Modal display
   const [showModal, setShowModal] = useState(false);
 
+  const [hasPermission, setHasPermission] = useState(false);
+
   const closeModal = () => {
     setShowModal(false);
   };
+
+   useEffect(() => {
+    const checkPermission = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/company/check-permission`,
+        {},
+        {
+          params: { access: 'job_add' },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        }
+      );
+
+      if (response.data.msg === 'Permission granted.') {
+        setHasPermission(true);
+      }
+    } catch (error) {
+      setHasPermission(false);
+      if (error?.response?.status === 403) {
+        setToastMessage("You don't have permission to add companies");
+        setShowToast(true);
+        // setTimeout(() => {
+        //   navigate('/dashboard');
+        // }, 2000);
+      } else if (error?.response?.status === 401) {
+        setToastMessage('Please login to continue');
+        setShowToast(true);
+        // setTimeout(() => navigate('/login'), 1500);
+      } else {
+        setToastMessage('Unable to verify permission.');
+        setShowToast(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  checkPermission();
+}, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -48,12 +91,13 @@ function PostJob() {
       const response = await axios.post(`${BASE_URL}/tpo/post-job`,
         data,
         {
+          params: { access: 'job_add' },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
         }
       )
-
+      //setHasPermission(true);
       // console.log(response.data)
       if (response?.data?.msg) {
         setToastMessage(response.data.msg);
@@ -66,6 +110,7 @@ function PostJob() {
         navigate('../tpo/job-listings', { state: newDataToPass });
       }
     } catch (error) {
+      //setHasPermission(false);
       if (error.response) {
         if (error?.response.data?.msg) setToastMessage(error.response.data.msg)
         else setToastMessage(error.message)
@@ -151,6 +196,22 @@ function PostJob() {
         loading ? (
           <div className="flex justify-center h-72 items-center">
             <i className="fa-solid fa-spinner fa-spin text-3xl" />
+          </div>
+        ) : !hasPermission ? (
+          <div className="flex flex-col items-center justify-center h-72">
+            <div className="text-center p-8 max-w-lg w-full backdrop-blur-md bg-white/30 border border-white/20 rounded-lg shadow shadow-red-400">
+              <div className="text-red-500 text-5xl mb-4">
+                <i className="fas fa-lock"></i>
+              </div>
+              <h4 className="text-xl font-semibold mb-3">Access Denied</h4>
+              <p className="text-gray-600 mb-3">
+                You don't have permission to {jobId ? "update" : "add"} companies.
+              </p>
+              <hr className="my-4" />
+              <p className="text-sm text-gray-500">
+                Please contact your administrator if you need access.
+              </p>
+            </div>
           </div>
         ) : (
           <>

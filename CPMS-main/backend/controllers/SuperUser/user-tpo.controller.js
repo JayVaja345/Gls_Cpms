@@ -9,14 +9,37 @@ const tpoUsers = async (req, res) => {
 
 const tpoAddUsers = async (req, res) => {
   const email = req.body.email;
+  const first_name = req.body.first_name
 
   try {
     if (await User.findOne({ email }))
       return res.json({ msg: "User Already Exists!" });
 
-    const hashPassword = await bcrypt.hash(req.body.password, 10);
+    console.log(req.body.password)
+    const generatedPassword = generatePassword();
 
-    const newUser = new User({ first_name: req.body.first_name, email: req.body.email, number: req.body.number, password: hashPassword, role: "tpo_admin" });
+    const hashPassword = await bcrypt.hash(generatedPassword, 10);
+
+    const selectedRole = "tpo_admin";
+
+    const roleData = await Role.findOne({ role: selectedRole });
+    if (!roleData) {
+      return res.status(400).json({ msg: "Role not found in system!" });
+    }
+
+    console.log("ROLE DATA => ", roleData);
+    console.log("ROLE ACCESS => ", roleData.access);
+
+
+    const newUser = new User({
+      first_name: req.body.first_name,
+      email: req.body.email,
+      number: req.body.number,
+      password: hashPassword,
+      role: selectedRole,
+      UserRoleAccess: roleData.access
+    });    
+
     await newUser.save();
     return res.json({ msg: "User Created!" });
   } catch (error) {
@@ -29,6 +52,11 @@ const tpoDeleteUsers = async (req, res) => {
   // const user = await Users.find({email: req.body.email});
   const ress = await User.deleteOne({ email: req.body.email });
   if (ress.acknowledged) {
+    // audit log
+    logAudit(req, {
+      actionType: 'TPO_USER_DELETED',
+      description: `Deleted TPO admin: ${req.body.email}`
+    });
     return res.json({ msg: "User Deleted Successfully!" });
   } else {
     return res.json({ msg: "Error While Deleting User!" });

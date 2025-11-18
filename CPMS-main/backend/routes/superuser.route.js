@@ -31,10 +31,23 @@ const {
   deactivateUser, 
   activateUser 
 } = require('../controllers/SuperUser/user-block.controller.js');
+// placement report
+const { getPlacementReport } = require('../controllers/SuperUser/placement.controller');
+
+const {viewUser,addRolePer,viewRolePer,updateRolePer,deleteRolePer,grantPermission,revokePermission} = require('../controllers/SuperUser/role-customization.js')
 
 
 
 router.post('/login', Login);
+
+//role customization
+router.get('/get-tpo_management_admin-Users',authenticateToken,viewUser)
+router.post('/addRolePer',authenticateToken,addRolePer)
+router.get('/viewRolePer',authenticateToken,viewRolePer)
+router.patch("/updateRole/:id", /*auth, requirePerm("roles_manage"),*/ authenticateToken,updateRolePer);
+router.delete("/deleteRole/:id", /*auth, requirePerm("roles_manage"),*/ authenticateToken,deleteRolePer);
+router.patch("/users/:id/access/grant", authenticateToken, grantPermission);
+router.patch("/users/:id/access/revoke", authenticateToken, revokePermission);
 
 // management routes
 router.get('/management-users', authenticateToken, managementUsers);
@@ -68,6 +81,8 @@ router.get('/users/status', authenticateToken, getAllUsersWithStatus);
 router.post('/users/toggle-status', authenticateToken, toggleUserStatus);
 router.post('/users/deactivate', authenticateToken, deactivateUser);
 router.post('/users/activate', authenticateToken, activateUser);
+// placement report (company wise placement counts)
+router.get('/placement-report', authenticateToken, getPlacementReport);
 
 
 module.exports = router;
