@@ -41,7 +41,7 @@ export const SidebarData = [
     iconOpened: <RiArrowUpSFill />,
     subNav: [
       {
-        title: "List All",
+        title: "List",
         path: "/tpo/companys",
         icon: <FaListUl />,
         cName: "sub-nav",

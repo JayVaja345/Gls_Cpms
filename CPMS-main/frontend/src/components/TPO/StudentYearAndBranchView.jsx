@@ -31,10 +31,14 @@ function StudentYearAndBranchView() {
   const [fourthYearECS, setFourthYearECS] = useState([]);
   const [fourthYearAIDS, setFourthYearAIDS] = useState([]);
 
+  const [hasPermission, setHasPermission] = useState(true);
+  const [error, setError] = useState(null);
+
   const fetchStudentsData = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${BASE_URL}/student/all-students-data-year-and-branch`, {
+        params: { access: 'students_list' },
         headers: {
           'Authorization': `Bearer ${token}`,
         }
@@ -65,11 +69,13 @@ function StudentYearAndBranchView() {
 
       // setLoading(false);
     } catch (error) {
-      console.log("Error fetching jobs ", error);
-      // if (error?.response?.data?.msg) {
-      // setToastMessage(error.response.data.msg);
-      // setShowToast(true);
-      // }
+      console.log("Error fetching students ", error);
+      if (error.response?.status === 403) {
+        setHasPermission(false);
+        setError("You don't have permission to view student data");
+      } else {
+        setError("Error loading student data");
+      }
     } finally {
       setLoading(false);
     }
@@ -81,13 +87,22 @@ function StudentYearAndBranchView() {
 
   return (
     <>
-      {
-        loading ? (
-          // <div className="flex justify-center h-72 items-center">
-          //   <i className="fa-solid fa-spinner fa-spin text-3xl" />
-          // </div>
-          <AccordionPlaceholder />
-        ) : (
+      {loading ? (
+        <AccordionPlaceholder />
+      ) : !hasPermission ? (
+        <div className="flex justify-center items-center h-[80vh]">
+          <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+            <h2 className="text-xl text-red-600 mb-2">Access Denied</h2>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex justify-center items-center h-[80vh]">
+          <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      ) : (
           <>
             <div className="my-4 max-md:p-2 md:p-6 overflow-auto">
               <div className="">

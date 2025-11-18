@@ -29,6 +29,8 @@ const ManagementSuperUser = lazy(() => import("./components/SuperUser/AddManagem
 const StudentSuperUser = lazy(() => import("./components/SuperUser/AddStudent.jsx"));
 const HomeSuperUser = lazy(() => import("./components/SuperUser/Home.jsx"));
 const ApproveStudent = lazy(() => import("./components/ApproveStudent.jsx"));
+const RoleCustomization = lazy(() => import("./components/SuperUser/RoleCustomization.jsx"))
+const RoleManage = lazy(() => import("./components/SuperUser/ManageRoles.jsx"))
 
 // common users
 // for admin, tpo to edit or view user details 
@@ -56,6 +58,7 @@ import './style/index.css';
 const ProtectedRoute = lazy(() => import("./components/protectedRoute.jsx"));
 import { UserProvider } from "./context/userContext.jsx";
 import LoadingComponent from "./components/Loading.jsx";
+
 
 
 function Layout({ header }) {
@@ -380,6 +383,14 @@ function App() {
               {/* edit post jobs */}
               <Route element={<Layout header="Edit Job Detail" />}>
                 <Route path="/admin/post-job/:jobId" element={<PostJobTPO />} />
+              </Route>
+
+              <Route element={<Layout header="Role Customization" />}>
+                <Route path="/admin/role-customization" element={<RoleCustomization />} />
+              </Route>
+
+              <Route element={<Layout header="Role Manage" />}>
+                <Route path="/admin/manage-roles" element={<RoleManage/>} />
               </Route>
 
             </Route>

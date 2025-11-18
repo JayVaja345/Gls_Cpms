@@ -12,19 +12,20 @@ const Login = require('../controllers/TPO/tpo.login.controller');
 const PostJob = require('../controllers/TPO/tpo.post-job.controller');
 
 const { AllJobs, DeleteJob, JobData, JobWithApplicants, StudentJobsApplied } = require('../controllers/user/user.all-jobs.controller');
+const { verifyRole } = require('../routes/user.route.js');
 
 // login post request for student
 router.post('/login', Login);
 
 
 // post job listing data
-router.post('/post-job', authenticateToken, PostJob);
+router.post('/post-job', authenticateToken , verifyRole, PostJob);
 
 // all jobs 
-router.get('/jobs',authenticateToken, AllJobs);
+router.get('/jobs',authenticateToken, verifyRole ,AllJobs);
 
 // delete job 
-router.post('/delete-job',authenticateToken, DeleteJob);
+router.post('/delete-job',authenticateToken, verifyRole ,DeleteJob);
 
 // view a job 
 router.get('/job/:jobId', authenticateToken, JobData);

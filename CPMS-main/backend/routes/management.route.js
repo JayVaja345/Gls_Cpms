@@ -18,14 +18,13 @@ const { AddTPO, AddManagement, AddStudent } = require('../controllers/Management
 // all notice related here
 const { SendNotice, GetAllNotice, DeleteNotice, GetNotice } = require('../controllers/Management/notice.controller');
 
-
-
+const { verifyRole } = require('../routes/user.route.js');
 
 router.post('/login', Login);
 
-router.get('/tpo-users', authenticateToken, UsersTPO);
+router.get('/tpo-users', authenticateToken, verifyRole, UsersTPO);
 
-router.post('/deletetpo', authenticateToken, DeleteTPO);
+router.post('/deletetpo', authenticateToken, verifyRole, DeleteTPO);
 
 // add management, tpo and student
 router.post('/addtpo', authenticateToken, AddTPO);
@@ -35,11 +34,11 @@ router.post('/add-student', authenticateToken, AddStudent);
 // notices all route here 
 router.post('/send-notice', authenticateToken, SendNotice);
 
-router.get('/get-all-notices', authenticateToken, GetAllNotice);
+router.get('/get-all-notices', authenticateToken, verifyRole ,GetAllNotice);
 
 router.get('/get-notice', authenticateToken, GetNotice);
 
-router.post('/delete-notice', authenticateToken, DeleteNotice);
+router.post('/delete-notice', authenticateToken, verifyRole, DeleteNotice);
 
 
 module.exports = router;

@@ -8,7 +8,6 @@ import Toast from '../components/Toast';
 import ModalBox from '../components/Modal';
 import { BASE_URL } from '../config/backend_url';
 
-
 function ViewlAllNotice() {
   document.title = 'CPMS | Notices';
   const [loading, setLoading] = useState(true);
@@ -22,6 +21,8 @@ function ViewlAllNotice() {
   // useState for Modal display
   const [showModal, setShowModal] = useState(false);
   const [modalToPass, setModalToPass] = useState('');
+  const [hasPermission, setHasPermission] = useState(false);
+  const [error, setError] = useState(null);
 
   const closeModal = () => setShowModal(false);
 
@@ -62,7 +63,14 @@ function ViewlAllNotice() {
 
   const confirmDelete = async (noticeId) => {
     try {
-      const response = await axios.post(`${BASE_URL}/management/delete-notice?noticeId=${noticeId}`);
+      const response = await axios.post(
+        `${BASE_URL}/management/delete-notice?noticeId=${noticeId}`
+      , {}, {
+        params : { access : "notice_delete" },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
       if (response?.data?.msg) {
         fetchNotices();
         setToastMessage(response.data.msg);
@@ -70,6 +78,8 @@ function ViewlAllNotice() {
       }
     } catch (error) {
       console.log('Error while deleting notice => ', error);
+      setToastMessage(error.response?.data?.error || "You don't have permission to delete this notice.");
+      setShowToast(true);
     }
     setShowModal(false);
   };
@@ -77,11 +87,12 @@ function ViewlAllNotice() {
   const fetchNotices = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/management/get-all-notices`, {
+        params: { access: "notice_list" },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       });
-
+      setHasPermission(true);
       if (currentUser?.role === 'tpo_admin') {
         const filteredNotices = response?.data?.filter(notice => (
           notice.sender_role === 'tpo_admin' || notice.receiver_role === 'tpo_admin'
@@ -95,6 +106,7 @@ function ViewlAllNotice() {
       }
     } catch (error) {
       console.log('Error while fetching notices => ', error);
+      setError(error.response?.data?.error || 'You dont have permission to access this resource.');
     } finally {
       setLoading(false);
     }
@@ -115,7 +127,19 @@ function ViewlAllNotice() {
       {
         loading ? (
           <TablePlaceholder />
-        ) : (
+        ) : !hasPermission ? (
+          <div className="flex justify-center items-center h-[80vh]">
+            <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+              <h2 className="text-xl text-red-600 mb-2">Access Denied</h2>
+              <p className="text-gray-600">{error}</p>
+            </div>
+          </div>
+        ) : error ? (
+        <div className="flex justify-center items-center h-[80vh]">
+          <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div> ) : (
           <>
             <div className=''>
               <Table

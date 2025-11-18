@@ -4,6 +4,7 @@ import Toast from './Toast';
 import ModalBox from './Modal';
 import axios from 'axios';
 import { BASE_URL } from '../config/backend_url';
+import { useNavigate } from 'react-router-dom';
 
 function ApproveStudent() {
   document.title = 'CPMS | Approve Students';
@@ -21,6 +22,37 @@ function ApproveStudent() {
   const [userEmailToProcess, setUserEmailToProcess] = useState(null);
   const [modalBody, setModalBody] = useState('');
   const [modalBtn, setModalBtn] = useState('');
+
+  const [hasPermission, setHasPermission] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); 
+
+   useEffect(() => {
+    const checkPermission = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/company/check-permission`,
+        {},
+        {
+          params: { access: 'students_approve' },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        }
+      );
+
+      if (response.data.msg === 'Permission granted.') {
+        setHasPermission(true);
+      }
+    } catch (error) {
+      setHasPermission(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  checkPermission();
+}, [navigate]);
 
   const fetchUserDetails = async () => {
     try {
@@ -108,7 +140,7 @@ function ApproveStudent() {
       }
       setShowModal(false);
     } catch (error) {
-      setToastMessage("Error approving user");
+      setToastMessage("You don't have permission to approve Student User");
       setShowToast(true);
       console.log("handleApproveStudent => AddUersTable.jsx ==> ", error);
     }
@@ -126,7 +158,15 @@ function ApproveStudent() {
       />
 
       {/* AddUserTable Component */}
-      <AddUserTable
+      {
+        !hasPermission ? (
+          <div className="flex justify-center items-center h-[80vh]">
+            <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+              <h2 className="text-xl text-red-600 mb-2">Access Denied</h2>
+              <p className="text-gray-600">{error || 'You do not have permission to approve student.'}</p>
+            </div>
+          </div>
+        ) : <AddUserTable
         users={users}
         loading={loading}
         handleDeleteUser={handleDeleteUser}
@@ -137,6 +177,8 @@ function ApproveStudent() {
         userToAdd={"approve-student"}
         handleApproveStudent={handleApproveStudent}
       />
+      }
+      
 
       {/* ModalBox Component for Delete Confirmation */}
       <ModalBox

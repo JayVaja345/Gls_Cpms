@@ -59,8 +59,11 @@ router.post('/delete-internship', authenticateToken, DeleteInternship);
 
 // for tpo and management only
 // student arrays
-router.get('/all-students-data-year-and-branch', authenticateToken, StudentDataYearBranchWise)
+const { verifyRole } = require('./user.route');
+
+// Protected route that requires students:list permission
+router.get('/all-students-data-year-and-branch', authenticateToken, verifyRole, StudentDataYearBranchWise)
 // student who is on interview or hired
-router.get('/notify-interview-hired', authenticateToken, NotifyStudentStatus)
+router.get('/notify-interview-hired', authenticateToken, verifyRole, NotifyStudentStatus)
 
 module.exports = router;

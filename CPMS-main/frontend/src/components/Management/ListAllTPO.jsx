@@ -19,14 +19,18 @@ function AddTPO() {
   const [showModal, setShowModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
+  const [hasPermission, setHasPermission] = useState(false);
+  const [hasDeletePermission, setHasDeletePermission] = useState(false);
+
   const fetchUserDetails = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/management/tpo-users`, {
+        params : { access : "tpo_list"},
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming token is stored in localStorage
         }
       });
-
+      setHasPermission(true);
       if (response.data) {
         // console.log(response.data.tpoUsers)
         setUsers(response.data.tpoUsers);
@@ -65,19 +69,24 @@ function AddTPO() {
       const response = await axios.post(`${BASE_URL}/management/deletetpo`,
         { email: userToDelete },
         {
+          params : { access : "tpo_delete"},
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
         }
       );
+      setHasDeletePermission(true);
       setShowModal(false);
       if (response.data) {
         setToastMessage(response.data.msg);
         setShowToast(true);
         fetchUserDetails();
-      }
+      } 
     } catch (error) {
       console.log("AddTPO => confirmDelete ==> ", error);
+      setToastMessage("You don't have permission to delete TPO User");
+      setShowToast(true);
+      setShowModal(false);
     }
   }
 
@@ -119,7 +128,15 @@ function AddTPO() {
         position="top-center"
       />
 
-      <AddUserTable
+      {
+        !hasPermission ? (
+          <div className="flex justify-center items-center h-[80vh]">
+            <div className="text-center p-8 bg-red-50 rounded-lg border border-red-100">
+              <h2 className="text-xl text-red-600 mb-2">Access Denied</h2>
+              <p className="text-gray-600">{'You do not have permission to view this content.'}</p>
+            </div>
+          </div>
+        ) : <AddUserTable
         users={users}
         loading={loading}
         handleDeleteUser={handleDeleteUser}
@@ -134,6 +151,9 @@ function AddTPO() {
         userToDelete={userToDelete}
         userToAdd={"TPO Admin"}
       />
+      }
+
+      
 
       {/* ModalBox Component for Delete Confirmation */}
       <ModalBox

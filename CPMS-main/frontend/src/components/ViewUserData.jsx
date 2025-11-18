@@ -40,7 +40,7 @@ function ViewUserData() {
 
         // Fetch current user data
         const currentUserResponse = axios.get(`${BASE_URL}/user/detail`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         // Fetch student data using userId
