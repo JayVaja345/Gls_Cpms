@@ -1,4 +1,5 @@
 const CompanySchema = require("../../models/company.model");
+const { logAudit } = require('../../utils/auditLogger');
 
 
 const AddCompany = async (req, res) => {
@@ -22,6 +23,11 @@ const AddCompany = async (req, res) => {
     });
 
     await newcmp.save();
+    // audit log
+    logAudit(req, {
+      actionType: 'COMPANY_CREATED',
+      description: `Created company: ${companyName}`
+    });
 
     return res.status(201).json({ msg: "Company Created Successfully!", });
   } catch (error) {
@@ -47,6 +53,11 @@ const UpdateCompany = async (req, res) => {
     company.companyDifficulty = companyDifficulty || company.companyDifficulty;
 
     await company.save();
+    // audit log
+    logAudit(req, {
+      actionType: 'COMPANY_UPDATED',
+      description: `Updated company: ${company.companyName}`
+    });
 
     return res.status(201).json({ msg: "Company Details Updated!", });
   } catch (error) {
@@ -85,6 +96,11 @@ const DeleteCompany = async (req, res) => {
     const company = await CompanySchema.findById(req.body.companyId);
     // company and related jobs removed
     await company.deleteOne();
+    // audit log
+    logAudit(req, {
+      actionType: 'COMPANY_DELETED',
+      description: `Deleted company: ${company.companyName}`
+    });
     return res.json({ msg: "Company Deleted Successfully!" });
   } catch (error) {
     console.log("company.all-company.controller.js = DeleteCompany => ", error);

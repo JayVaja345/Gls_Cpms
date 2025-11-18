@@ -1,5 +1,6 @@
 const User = require("../../models/user.model");
 const JobSchema = require("../../models/job.model");
+const { logAudit } = require('../../utils/auditLogger');
 
 
 const UpdateJobStatus = async (req, res) => {
@@ -29,6 +30,11 @@ const UpdateJobStatus = async (req, res) => {
 
     await student.save();
     await job.save();
+    // audit log
+    logAudit(req, {
+      actionType: 'JOB_STATUS_UPDATED',
+      description: `Updated job status for student ${student.email} on job ${job.jobTitle}`
+    });
     return res.json({ msg: "Job Status Updated Successfully!" });
   } catch (error) {
     console.log("update-job-status.controller.js => ", error);

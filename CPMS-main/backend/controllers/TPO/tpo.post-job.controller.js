@@ -1,4 +1,5 @@
 const JobSchema = require("../../models/job.model");
+const { logAudit } = require('../../utils/auditLogger');
 
 const PostJob = async (req, res) => {
   try {
@@ -29,6 +30,11 @@ const PostJob = async (req, res) => {
         howToApply,
         applicationDeadline
       });
+      // audit log
+      logAudit(req, {
+        actionType: 'JOB_UPDATED',
+        description: `Updated job: ${jobTitle}`
+      });
       res.status(201).json({ msg: 'Job Updated successfully' });
     } else {
       // Create a new job object
@@ -43,6 +49,11 @@ const PostJob = async (req, res) => {
         company
       });
       await newJob.save();
+      // audit log
+      logAudit(req, {
+        actionType: 'JOB_CREATED',
+        description: `Posted new job: ${jobTitle}`
+      });
       return res.status(201).json({ msg: 'Job posted successfully' });
     }
 

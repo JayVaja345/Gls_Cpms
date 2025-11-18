@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Notice = require('../../models/notice.model');
+const { logAudit } = require('../../utils/auditLogger');
 
 const SendNotice = async (req, res) => {
   try {
@@ -12,6 +13,11 @@ const SendNotice = async (req, res) => {
     const sender = new mongoose.Types.ObjectId(req.body.sender);
 
     await Notice.create({ sender, sender_role, receiver_role, title, message });
+    // audit log
+    logAudit(req, {
+      actionType: 'NOTICE_CREATED',
+      description: `Notice sent to ${receiver_role}${title ? `: ${title}` : ''}`
+    });
     return res.json({ msg: "Notice Sended Successfully!" });
   } catch (error) {
     console.log('error in notice.controller.js => ', error);
@@ -44,7 +50,12 @@ const GetNotice = async (req, res) => {
 const DeleteNotice = async (req, res) => {
   try {
     if (!req.query.noticeId) return res.json({ msg: "Error while deleting notice!" });
-    await Notice.findByIdAndDelete(req?.query?.noticeId);
+    const deleted = await Notice.findByIdAndDelete(req?.query?.noticeId);
+    // audit log
+    logAudit(req, {
+      actionType: 'NOTICE_DELETED',
+      description: `Notice deleted${deleted?.title ? `: ${deleted.title}` : ''}`
+    });
     return res.json({ msg: "Notice Deleted Successfully!" });
   } catch (error) {
     console.log('error in notice.controller.js => ', error);

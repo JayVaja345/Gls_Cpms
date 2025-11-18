@@ -4,6 +4,7 @@ const Role = require("../../models/roles")
 const generatePassword = require("../../utlis/generatePassword");
 const sendMail = require("../../config/Nodemailer");
 const emailTemplate = require("../../utlis/emailTemplates");
+const { logAudit } = require('../../utils/auditLogger');
 
 // get management user
 const managementUsers = async (req, res) => {
@@ -52,6 +53,11 @@ const managementAddUsers = async (req, res) => {
     
     await sendMail(email, subject, html);
 
+    // audit log
+    logAudit(req, {
+      actionType: 'MANAGEMENT_USER_CREATED',
+      description: `Created management admin: ${newUser.email}`
+    });
     return res.json({ msg: "User Created!" });
   } catch (error) {
     console.log("admin.user-management => ", error);
@@ -63,6 +69,11 @@ const managementDeleteUsers = async (req, res) => {
   // const user = await Users.find({email: req.body.email});
   const ress = await User.deleteOne({ email: req.body.email });
   if (ress.acknowledged) {
+    // audit log
+    logAudit(req, {
+      actionType: 'MANAGEMENT_USER_DELETED',
+      description: `Deleted management admin: ${req.body.email}`
+    });
     return res.json({ msg: "User Deleted Successfully!" });
   } else {
     return res.json({ msg: "Error While Deleting User!" });

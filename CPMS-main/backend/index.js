@@ -34,6 +34,10 @@ app.use('/admin', require('./routes/superuser.route'));
 app.use('/api/export', require('./routes/export.route'));
 
 app.use('/company', require('./routes/company.route'));
+// route for audit logs
+app.use('/audit', require('./routes/auditLogRoutes'));
+
+
 
 app.listen(process.env.PORT, () => {
   console.log(`server is running in http://localhost:${process.env.PORT}`);
