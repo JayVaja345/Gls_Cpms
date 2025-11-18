@@ -120,4 +120,9 @@ export const SidebarData = [
       },
     ],
   },
+  {
+    title: "Placement Report",
+    path: "/admin/placement-report",
+    icon: <FaClipboardCheck />,
+  },
 ];

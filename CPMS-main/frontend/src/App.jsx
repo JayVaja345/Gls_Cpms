@@ -29,6 +29,7 @@ const ManagementSuperUser = lazy(() => import("./components/SuperUser/AddManagem
 const StudentSuperUser = lazy(() => import("./components/SuperUser/AddStudent.jsx"));
 const HomeSuperUser = lazy(() => import("./components/SuperUser/Home.jsx"));
 const ApproveStudent = lazy(() => import("./components/ApproveStudent.jsx"));
+const PlacementReport = lazy(() => import('./components/SuperUser/PlacementReport.jsx'));
 
 // common users
 // for admin, tpo to edit or view user details 
@@ -380,6 +381,10 @@ function App() {
               {/* edit post jobs */}
               <Route element={<Layout header="Edit Job Detail" />}>
                 <Route path="/admin/post-job/:jobId" element={<PostJobTPO />} />
+              </Route>
+
+              <Route element={<Layout header="Placement Report" />}>
+                <Route path="/admin/placement-report" element={<PlacementReport />} />
               </Route>
 
             </Route>
