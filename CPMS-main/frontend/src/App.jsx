@@ -392,12 +392,14 @@ function App() {
 
               <Route element={<Layout header="Role Manage" />}>
                 <Route path="/admin/manage-roles" element={<RoleManage/>} />
+              
+              </Route>
               <Route element={<Layout header="Placement Report" />}>
                 <Route path="/admin/placement-report" element={<PlacementReport />} />
-              </Route>
 
             </Route>
              </Route>
+
 
             {/* 404 page not found route */}
             <Route path="*" element={<PageNotFound />} />
