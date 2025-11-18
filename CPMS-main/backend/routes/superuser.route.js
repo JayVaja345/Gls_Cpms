@@ -13,6 +13,8 @@ const { managementUsers, managementAddUsers, managementDeleteUsers } = require('
 const { tpoUsers, tpoAddUsers, tpoDeleteUsers } = require('../controllers/SuperUser/user-tpo.controller.js');
 // student methods
 const { studentUsers, studentAddUsers, studentDeleteUsers, studentApprove } = require('../controllers/SuperUser/user-student.controller.js');
+// placement report
+const { getPlacementReport } = require('../controllers/SuperUser/placement.controller');
 
 const {viewUser,addRolePer,viewRolePer,updateRolePer,deleteRolePer,grantPermission,revokePermission} = require('../controllers/SuperUser/role-customization.js')
 
@@ -45,6 +47,9 @@ router.post('/student-add-user', authenticateToken, studentAddUsers);
 router.post('/student-delete-user', authenticateToken, studentDeleteUsers);
 // approve student
 router.post('/student-approve', authenticateToken, studentApprove);
+
+// placement report (company wise placement counts)
+router.get('/placement-report', authenticateToken, getPlacementReport);
 
 
 module.exports = router;

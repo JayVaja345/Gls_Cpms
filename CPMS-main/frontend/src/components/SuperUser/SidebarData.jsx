@@ -140,5 +140,8 @@ export const SidebarData = [
         cName: "sub-nav",
       },
     ],
+    title: "Placement Report",
+    path: "/admin/placement-report",
+    icon: <FaClipboardCheck />,
   },
 ];

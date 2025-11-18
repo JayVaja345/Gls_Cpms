@@ -31,6 +31,7 @@ const HomeSuperUser = lazy(() => import("./components/SuperUser/Home.jsx"));
 const ApproveStudent = lazy(() => import("./components/ApproveStudent.jsx"));
 const RoleCustomization = lazy(() => import("./components/SuperUser/RoleCustomization.jsx"))
 const RoleManage = lazy(() => import("./components/SuperUser/ManageRoles.jsx"))
+const PlacementReport = lazy(() => import('./components/SuperUser/PlacementReport.jsx'));
 
 // common users
 // for admin, tpo to edit or view user details 
@@ -391,9 +392,12 @@ function App() {
 
               <Route element={<Layout header="Role Manage" />}>
                 <Route path="/admin/manage-roles" element={<RoleManage/>} />
+              <Route element={<Layout header="Placement Report" />}>
+                <Route path="/admin/placement-report" element={<PlacementReport />} />
               </Route>
 
             </Route>
+             </Route>
 
             {/* 404 page not found route */}
             <Route path="*" element={<PageNotFound />} />
